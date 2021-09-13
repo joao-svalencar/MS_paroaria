@@ -33,7 +33,7 @@ text(12,6,"R²=0.4625 p<0.001")
 
 #ponderado
 coletivo<-
-    ggplot(col_b,aes(y=pond, x=tb,group=tb))+
+    ggplot(col_b, aes(y=pond, x=tb,group=tb))+
     geom_boxplot()+
     geom_smooth(method=lm,se=F, color="black",aes(group=1))+
     labs(y="Relative number of watchers ",x="Flock size",size=10)+
@@ -42,29 +42,32 @@ coletivo<-
     annotate("text",x=11,y=0,size=8, label="b=-0.023, SE=0.008, t=-2.74, r²=0.09 p=0.008")+
     theme_classic(base_size=24)
 
-    png("/home/oierison/2/Vigilancia Bando/Dados/coletivo.png",1200,800)
-    coletivo
-    dev.off()
+png(here("outputs", "figures", "coletivo"),1200,800)
+coletivo
+dev.off()
+
 lm_wnumber_pond <- lm(col_b$pond~col_b$tb)
 abline(lm_wnumber_pond)
 summary(lm_wnumber_pond)
 
 
 #Individual
-ind<-read.table("ind_b.csv", h=T)
-desenho<-readPNG("/home/oierison/2/Vigilancia Bando/Apresentação/Paroariar.png", native = T)
-individual<-ggplot(ind ,aes(y=tx, x=tb,group=tb))+
+ind <- read.table(here("data", "ind_b.csv"), h=T)
+
+desenho <- readPNG(here("outputs", "figures", "Paroaria.png"), native = T)
+
+individual<-ggplot(ind, aes(y=tx, x=tb, group=tb))+
  geom_boxplot()+
     geom_smooth(method=lm,se=F, color="black",aes(group=1))+
 labs(y="Time watching (seg)",x="Flock size",size=10)+
     scale_x_discrete(limits=factor(1:13))+
 geom_dotplot(binaxis='y', stackdir='center', dotsize=0.5)+
     annotate("text",x=4,y=1,size=8, label="b=-0.915, SE=0.04, t=-22.95, r²=0.8193 p<0.001")+
-   theme_classic(base_size=24)+
-    inset_element(desenho,left = 0.02,bottom = 0.1,right = 0.3,top = 0.6)
+    theme_classic(base_size=24)+
+    inset_element(desenho, left = 0.02, bottom = 0.1, right = 0.3, top = 0.6)
 individual
 
-png("/home/oierison/2/Vigilancia Bando/Dados/individual.png",1200,800)
+png(here("outputs", "figures", "individual.png"), 1200,800)
 individual
 dev.off()
 
@@ -77,5 +80,3 @@ text(4,5,"b=-0.915, SE=0.04, t=-22.95, r²=0.8193 p<0.001")
 lm_ind<- lm(ind$tx~ind$tb)
 summary(lm_ind)
 abline(lm_ind)
-
-

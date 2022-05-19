@@ -13,15 +13,12 @@ watch$prop <- cbind(sucess = watch$watchers, fail = watch$flock_size - watch$wat
 glm <- glm(prop~flock_size, data=watch, family=binomial)
 summary(glm)
 
-#calculate McFadden's R-squared for model
-with(summary(glm), 1 - deviance/null.deviance)
+unique(predict(glm, watch, type="response"))
+
 
 exp(glm$coefficients)
-exp(glm$coefficients)[1]/(1+exp(glm$coefficients)[1])
-exp(glm$coefficients)[2]/(1+exp(glm$coefficients)[2])
 
-
- watch$per <- (watch$watchers/watch$flock_size)
+watch$per <- (watch$watchers/watch$flock_size)
 
 # Figure 1 ----------------------------------------------------------------
 
@@ -35,6 +32,7 @@ a + geom_smooth(method = "glm", se=FALSE, color="red")
 png(here("outputs", "figures", "Figure 1.png"),800,600)
 a + geom_smooth(method = "glm", se=FALSE, color="red")
 dev.off()
+table(watch$flock_size)
 
 # Vigilance time ----------------------------------------------------------
 
@@ -43,6 +41,8 @@ shapiro.test(time$time) #normality test
 
 lm <- lm(time~flock_size, data=time)
 summary(lm)
+
+unique(predict(lm, time, type="response"))
 
 # Figure 2 ----------------------------------------------------------------
 

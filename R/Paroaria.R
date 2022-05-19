@@ -1,82 +1,63 @@
-library(ggpubr)
-library(cowplot)
-library(magick)
 library(png)
-library(grid)
-library(patchwork)
 library(here)
+library(ggplot2)
+library(patchwork)
 
-col_a<-read.csv(here("data", "col_a.csv"), header=T)
-col_a
-#Tamanho
-col_a[1,]
-prop.table(col_a)
+# Proportion of vigilants -------------------------------------------------
 
-col_a[,1]
-col_a[1,]
-data.frame(col_a)
+watch <- read.csv(here("data", "watchers.csv"), header=T)
+watch$prop <- cbind(sucess = watch$watchers, fail = watch$flock_size - watch$watchers)
 
-#plot multi
-col_b<-read.csv(here("data", "col_b.csv"), header=T)
-col_b
+# Generalized Linear Model (GLM) ------------------------------------------
 
-###Plot
-par(bty="l")
-boxplot(col_b$vig~col_b$tb, #to see the relationship between 
-     xlab="flock size",
-     ylab = "watchers number")
-    
-lm_wnumber <- lm(col_b$vig~col_b$tb)
-summary(lm_wnumber)
-abline(lm_wnumber )
-text(12,6,"R²=0.4625 p<0.001")
+glm <- glm(prop~flock_size, data=watch, family=binomial)
+summary(glm)
 
-#ponderado
-coletivo<-
-    ggplot(col_b, aes(y=pond, x=tb,group=tb))+
-    geom_boxplot()+
-    geom_smooth(method=lm,se=F, color="black",aes(group=1))+
-    labs(y="Relative number of watchers ",x="Flock size",size=10)+
-    geom_dotplot(binaxis='y', stackdir='center', dotsize=0.5)+
+#calculate McFadden's R-squared for model
+with(summary(glm), 1 - deviance/null.deviance)
+
+exp(glm$coefficients)
+exp(glm$coefficients)[1]/(1+exp(glm$coefficients)[1])
+exp(glm$coefficients)[2]/(1+exp(glm$coefficients)[2])
+
+
+ watch$per <- (watch$watchers/watch$flock_size)
+
+# Figure 1 ----------------------------------------------------------------
+
+a <-ggplot(watch, aes(y=per, x=flock_size))+
+    geom_jitter(size=2)+
+    labs(y="Proportion of vigilant individuals", x="Flock size",size=10)+
     scale_x_discrete(limits=factor(1:13))+
-    annotate("text",x=11,y=0,size=8, label="b=-0.023, SE=0.008, t=-2.74, r²=0.09 p=0.008")+
     theme_classic(base_size=24)
+a + geom_smooth(method = "glm", se=FALSE, color="red")
 
-png(here("outputs", "figures", "coletivo"),1200,800)
-coletivo
+png(here("outputs", "figures", "Figure 1.png"),800,600)
+a + geom_smooth(method = "glm", se=FALSE, color="red")
 dev.off()
 
-lm_wnumber_pond <- lm(col_b$pond~col_b$tb)
-abline(lm_wnumber_pond)
-summary(lm_wnumber_pond)
+# Vigilance time ----------------------------------------------------------
 
+time <- read.csv(here("data", "time.csv"), header=T)
+shapiro.test(time$time) #normality test
 
-#Individual
-ind <- read.table(here("data", "ind_b.csv"), h=T)
+lm <- lm(time~flock_size, data=time)
+summary(lm)
 
-desenho <- readPNG(here("outputs", "figures", "Paroaria.png"), native = T)
+# Figure 2 ----------------------------------------------------------------
 
-individual<-ggplot(ind, aes(y=tx, x=tb, group=tb))+
- geom_boxplot()+
-    geom_smooth(method=lm,se=F, color="black",aes(group=1))+
-labs(y="Time watching (seg)",x="Flock size",size=10)+
+img <- readPNG(here("outputs", "figures", "Paroaria.png"), native = T)
+
+b <-ggplot(time, aes(y=time, x=flock_size, group=flock_size))+
+    geom_boxplot()+
+    labs(y="Time watching (s)",x="Flock size",size=10)+
     scale_x_discrete(limits=factor(1:13))+
-geom_dotplot(binaxis='y', stackdir='center', dotsize=0.5)+
-    annotate("text",x=4,y=1,size=8, label="b=-0.915, SE=0.04, t=-22.95, r²=0.8193 p<0.001")+
+    annotate("text",x=5,y=0,size=8, label="b=-1.012, SE=0.06, t=-17.02, R²=0.82 p<0.001")+
+    geom_dotplot(binaxis='y', stackdir='center', dotsize=0.5)+
     theme_classic(base_size=24)+
-    inset_element(desenho, left = 0.02, bottom = 0.1, right = 0.3, top = 0.6)
-individual
+    inset_element(img, left = 0.02, bottom = 0.07, right = 0.3, top = 0.5)
+b
 
-png(here("outputs", "figures", "individual.png"), 1200,800)
-individual
+png(here("outputs", "figures", "Figure 2_new.png"),800,600)
+b
 dev.off()
-
-#####################3
-boxplot(ind$tx~ind$tb,
-        xlab="flock size",
-        ylab = "Time watching (seg)"
-        )
-text(4,5,"b=-0.915, SE=0.04, t=-22.95, r²=0.8193 p<0.001")
-lm_ind<- lm(ind$tx~ind$tb)
-summary(lm_ind)
-abline(lm_ind)

@@ -15,7 +15,6 @@ summary(glm)
 
 unique(predict(glm, watch, type="response"))
 
-
 exp(glm$coefficients)
 
 watch$per <- (watch$watchers/watch$flock_size)
@@ -61,5 +60,3 @@ b
 png(here("outputs", "figures", "Figure 2_new.png"),800,600)
 b
 dev.off()
-
-#test

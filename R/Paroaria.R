@@ -62,7 +62,7 @@ fig2 <-ggplot(time, aes(y=time, x=flock_size, group=flock_size))+
              label="b = -1.012, SE = 0.06, t = -17.02, R² = 0.82 p < 0.001")+
     geom_dotplot(binaxis='y', stackdir='center', dotsize=0.5)+
     theme_classic(base_size=8, base_family = "Arial")+
-    inset_element(img, left = 0.02, bottom = 0.07, right = 0.3, top = 0.5)
+    inset_element(img, left = 0.01, bottom = 0.06, right = 0.4, top = 0.55)
 fig2
 
 ggsave("Fig 2.png",

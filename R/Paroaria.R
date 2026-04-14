@@ -25,7 +25,7 @@ fig1 <-ggplot(watch, aes(y=per, x=flock_size))+
     geom_jitter(size=.6)+
     labs(y="Proportion of vigilant individuals", x="Flock size")+
     scale_x_discrete(limits=factor(1:13))+
-    theme_classic(base_size=8)
+    theme_classic(base_size=8, base_family = "Arial")
 fig1 + geom_smooth(method = "glm", se=FALSE, color="red")
 
 ggsave("Fig 1.png",
@@ -61,7 +61,7 @@ fig2 <-ggplot(time, aes(y=time, x=flock_size, group=flock_size))+
     annotate("text", x = 5, y = 0, size = 2,
              label="b = -1.012, SE = 0.06, t = -17.02, R² = 0.82 p < 0.001")+
     geom_dotplot(binaxis='y', stackdir='center', dotsize=0.5)+
-    theme_classic(base_size=8)+
+    theme_classic(base_size=8, base_family = "Arial")+
     inset_element(img, left = 0.02, bottom = 0.07, right = 0.3, top = 0.5)
 fig2
 

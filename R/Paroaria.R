@@ -21,16 +21,23 @@ watch$per <- (watch$watchers/watch$flock_size)
 
 # Figure 1 ----------------------------------------------------------------
 
-a <-ggplot(watch, aes(y=per, x=flock_size))+
-    geom_jitter(size=2)+
-    labs(y="Proportion of vigilant individuals", x="Flock size",size=10)+
+fig1 <-ggplot(watch, aes(y=per, x=flock_size))+
+    geom_jitter(size=.6)+
+    labs(y="Proportion of vigilant individuals", x="Flock size")+
     scale_x_discrete(limits=factor(1:13))+
-    theme_classic(base_size=24)
-a + geom_smooth(method = "glm", se=FALSE, color="red")
+    theme_classic(base_size=8)
+fig1 + geom_smooth(method = "glm", se=FALSE, color="red")
 
-png(here("outputs", "figures", "Figure 1.png"),800,600)
-a + geom_smooth(method = "glm", se=FALSE, color="red")
-dev.off()
+ggsave("Fig 1.png",
+       device = png,
+       plot = fig1 + geom_smooth(method = "glm", se=FALSE, color="red"),
+       path = here::here("outputs", "figures"),
+       width = 89,
+       height = 80,
+       units = "mm",
+       dpi = 300
+)
+
 table(watch$flock_size)
 
 # Vigilance time ----------------------------------------------------------
@@ -47,16 +54,26 @@ unique(predict(lm, time, type="response"))
 
 img <- readPNG(here("outputs", "figures", "Paroaria.png"), native = T)
 
-b <-ggplot(time, aes(y=time, x=flock_size, group=flock_size))+
+fig2 <-ggplot(time, aes(y=time, x=flock_size, group=flock_size))+
     geom_boxplot()+
-    labs(y="Time watching (s)",x="Flock size",size=10)+
+    labs(y="Time watching (s)",x="Flock size")+
     scale_x_discrete(limits=factor(1:13))+
-    annotate("text",x=5,y=0,size=8, label="b=-1.012, SE=0.06, t=-17.02, R²=0.82 p<0.001")+
+    annotate("text", x = 5, y = 0, size = 2,
+             label="b = -1.012, SE = 0.06, t = -17.02, R² = 0.82 p < 0.001")+
     geom_dotplot(binaxis='y', stackdir='center', dotsize=0.5)+
-    theme_classic(base_size=24)+
+    theme_classic(base_size=8)+
     inset_element(img, left = 0.02, bottom = 0.07, right = 0.3, top = 0.5)
-b
+fig2
 
-png(here("outputs", "figures", "Figure 2_new.png"),800,600)
-b
-dev.off()
+ggsave("Fig 2.png",
+       device = png,
+       plot = fig2,
+       path = here::here("outputs", "figures"),
+       width = 89,
+       height = 80,
+       units = "mm",
+       dpi = 300
+)
+
+
+
